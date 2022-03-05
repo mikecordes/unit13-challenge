@@ -26,6 +26,57 @@ def build_validation_result(is_valid, violated_slot, message_content):
         "message": {"contentType": "PlainText", "content": message_content},
     }
 
+def get_investmetn_recommendation(risk_level):
+    """
+    Returns the investment recommendation based on risk profile.
+    """
+    risk_levels = {
+        "None": "90% bonds (AGG), 10% cash in Money Market Savings Account, 0% equities",
+        "Very Low": "90% bonds (BIV), 5% Cash in Money Market Savings Account, 5% equities (BRK.A)",
+        "Low": "80% bonds (AGG), 15% equities (AAPL), 5% Cash in Money Market Savings Account",
+        "Medium": "40% bonds (AGG), 60% equities split equally across (SPY) (AAPL)",
+        "High": "10% bonds (AGG), 90% equities split equally across (SPY) (AAPL) (TSLA)",
+        "Very High": "0% bonds (AGG), 100% equities split equally across (SPY) (TSLA) (GME) (AAPL) (DIS) (AMC)"
+    }
+    
+        return risk_levels[risk_level.lower()]
+
+
+def validate_data(age, investment_amount, intent_request):
+    """
+    Validation check on data entered.
+    """
+    
+    #validate age is valid
+    if age is not None:
+        age = parse_int(
+            age
+        )
+        if age < 0:
+            return build_validation_result(
+                False,
+                "age",
+                "This tools designed for individuals between 0 and 65 years of age, please enter an age greater than 0",
+            )
+        elif  age >= 65:
+            return build_validation_result(
+                False,
+                "age",
+                "This tools designed for individuals between 0 and 65 years of age, please enter an age less than 65.",
+            )
+        
+    #is investment at min $5000
+    if investment_amount is not None:
+        investment_amount - parse_int(investment_amount)
+        if investment_amount < 5000:
+            return build_valdiation_results(
+                False,
+                "investmentAmount",
+                "Please provide a greater amount, the minimum investment amount is $5,000.",
+            )
+    
+    return build_validation_restult(True, None, None)
+
 
 ### Dialog Actions Helper Functions ###
 def get_slots(intent_request):
@@ -109,7 +160,20 @@ def recommend_portfolio(intent_request):
     # Get the initial investment recommendation
 
     ### YOUR FINAL INVESTMENT RECOMMENDATION CODE STARTS HERE ###
-
+    if risk_level == "None":
+        initial_recommendation = "90% bonds (AGG), 10% cash in Money Market Savings Account, 0% equities"
+    elif risk_level == "Very Low":
+        initial_recommendation = "90% bonds (BIV), 5% Cash in Money Market Savings Account, 5% equities (BRK.A)"
+    elif risk_level == "Low":
+        initial_recommendation = "80% bonds (AGG), 15% equities (AAPL), 5% Cash in Money Market Savings Account"
+    elif risk_level == "Medium":
+        initial_recommendation = "40% bonds (AGG), 60% equities split equally across (SPY) (AAPL)"
+    elif risk_level == "High":
+        initial_recommendation = "10% bonds (AGG), 90% equities split equally across (SPY) (AAPL) (TSLA)"
+    elif risk_level == "Very High":
+        initial_recommendation = "0% bonds (AGG), 100% equities split equally across (SPY) (TSLA) (GME) (AAPL) (DIS) (AMC)"
+    else:
+        initial_recommendation ="risk_level not recognized
     ### YOUR FINAL INVESTMENT RECOMMENDATION CODE ENDS HERE ###
 
     # Return a message with the initial recommendation based on the risk level.
